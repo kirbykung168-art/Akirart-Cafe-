@@ -83,6 +83,7 @@ Sources:
   "servesCuisine":["Cafe","Coffee","Bakery"],
   "priceRange":"฿",
   "address":{"@type":"PostalAddress","streetAddress":"138 Soi Pradu","addressLocality":"Pom Prap, Pom Prap Sattru Phai","addressRegion":"Bangkok","postalCode":"10100","addressCountry":"TH"},
+  "telephone":"+66864087242",
   "openingHoursSpecification":[
     {"@type":"OpeningHoursSpecification","dayOfWeek":["Wednesday","Thursday","Friday","Saturday","Sunday","Monday"],"opens":"10:00","closes":"18:00"}
   ],
@@ -530,6 +531,69 @@ footer .credit{opacity:.55;max-width:48ch;line-height:1.7}
 .lightbox img{max-width:96vw;max-height:88vh}
 .lightbox .close{position:absolute;top:18px;right:18px;font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--green);padding:.6rem .9rem;border:1px solid var(--green);font-weight:700}
 
+/* BIOS BOOT — signature hero overlay */
+.bios-boot{
+  position:fixed; inset:0; z-index:9999;
+  background:#040502;
+  color:var(--green);
+  font-family:var(--mono); font-weight:500;
+  font-size:clamp(11px, 1.35vw, 15px);
+  line-height:1.55;
+  padding:clamp(20px, 4.5vw, 64px) clamp(20px, 4.5vw, 64px) clamp(60px, 7vw, 96px);
+  overflow:hidden;
+  text-shadow:0 0 6px rgba(58,255,122,.45), 0 0 14px rgba(58,255,122,.18);
+  transform-origin:center center;
+  will-change:transform, opacity, filter;
+}
+.bios-boot::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0,rgba(58,255,122,.06) 1px,transparent 2px,transparent 4px),
+             radial-gradient(ellipse at center, rgba(58,255,122,.04), transparent 70%),
+             radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.65) 100%);
+}
+.bios-boot::after{
+  content:""; position:absolute; left:0; right:0; height:2px; top:0;
+  background:linear-gradient(90deg, transparent, rgba(58,255,122,.5), transparent);
+  animation:biosScan 2.6s linear infinite;
+  pointer-events:none;
+}
+@keyframes biosScan{
+  0%{top:0;opacity:.7}
+  100%{top:100%;opacity:0}
+}
+.bios-boot .bios-lines{position:relative; z-index:2; max-width:78ch; white-space:pre-wrap; word-break:break-word}
+.bios-boot .bios-line{display:block; min-height:1.55em}
+.bios-boot .bios-line.amber{color:var(--amber); text-shadow:0 0 6px rgba(255,184,74,.4)}
+.bios-boot .bios-line.dim{color:var(--green-soft); opacity:.75}
+.bios-boot .bios-cursor{display:inline-block; width:.55em; height:1em; background:var(--green); vertical-align:-2px; margin-left:.15em; box-shadow:0 0 8px rgba(58,255,122,.65); animation:biosBlink 1s steps(1) infinite}
+@keyframes biosBlink{50%{opacity:0}}
+.bios-boot .bios-skip{
+  position:absolute; right:clamp(16px,3vw,32px); bottom:clamp(14px,2.5vw,28px);
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--green); background:transparent; padding:.5rem .85rem;
+  border:1px solid var(--green); cursor:pointer; z-index:3;
+  transition:background .2s var(--easing), color .2s var(--easing);
+}
+.bios-boot .bios-skip:hover{background:var(--green);color:#040502}
+.bios-boot.power-off{animation:crtOff .55s cubic-bezier(.6,0,.4,1) forwards}
+@keyframes crtOff{
+  0%{transform:scaleY(1) scaleX(1); filter:brightness(1)}
+  35%{transform:scaleY(.02) scaleX(1); filter:brightness(2.4)}
+  60%{transform:scaleY(.005) scaleX(.6); filter:brightness(3)}
+  85%{transform:scaleY(.005) scaleX(.005); filter:brightness(3); opacity:1}
+  100%{transform:scaleY(.005) scaleX(.005); filter:brightness(3); opacity:0}
+}
+body.booting{overflow:hidden}
+body.booting .topbar,body.booting .nav,body.booting .hero{opacity:0}
+@media (prefers-reduced-motion: reduce){
+  .bios-boot::after{display:none}
+  .bios-boot.power-off{animation:none; opacity:0; transition:opacity .2s linear}
+}
+@media (max-width: 600px){
+  .bios-boot{font-size:11px; padding:24px 18px 80px}
+  .bios-boot .bios-skip{font-size:9.5px}
+}
+
 /* reveal */
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .9s var(--easing),transform .9s var(--easing)}
 .reveal.in{opacity:1;transform:none}
@@ -590,6 +654,12 @@ footer .credit{opacity:.55;max-width:48ch;line-height:1.7}
 </style>
 </head>
 <body>
+
+<!-- BIOS BOOT OVERLAY · signature moment -->
+<div class="bios-boot" id="biosBoot" role="dialog" aria-label="Akirart system boot" aria-hidden="false">
+  <pre class="bios-lines" id="biosLines" aria-live="polite"></pre>
+  <button class="bios-skip" id="biosSkip" type="button">▮ skip · [esc]</button>
+</div>
 
 <!-- TOPBAR -->
 <div class="topbar" role="banner">
@@ -703,8 +773,9 @@ footer .credit{opacity:.55;max-width:48ch;line-height:1.7}
 <section class="proof" aria-label="proof">
   <div class="wrap proof-grid">
     <div class="proof-cell">
-      <div class="n">7,800<em>+</em></div>
-      <div class="l">@akirart.coffee · followers</div>
+      <div class="quote">"We believe in great <em style="font-style:normal;color:var(--green)">coffee</em> &amp; <em style="font-style:normal;color:var(--green)">good vibes</em>."
+        <cite>— @akirart.coffee · bio</cite>
+      </div>
     </div>
     <div class="proof-cell">
       <div class="n">~30</div>
@@ -819,10 +890,10 @@ footer .credit{opacity:.55;max-width:48ch;line-height:1.7}
       </article>
 
       <article class="tile t-5 reveal d2">
-        <div class="lbl">ROTATING.CAKE</div>
-        <div class="name">House cakes</div>
-        <div class="desc">The cabinet rotates. Past hits: Thai Tea Cake, Matcha, Coffee Loaf.</div>
-        <div class="price">฿60–฿120</div>
+        <div class="lbl">NEW · BAKERY · X URARA</div>
+        <div class="name">Brown Butter Basque Burnt Cheesecake</div>
+        <div class="desc">A collab with <em>@urara.project</em> — the "best Basque burnt cheesecake of our office," per the bar.</div>
+        <div class="price">ask the bar</div>
       </article>
 
       <article class="tile callout t-6 reveal d3">
@@ -917,7 +988,7 @@ footer .credit{opacity:.55;max-width:48ch;line-height:1.7}
         <span class="mono" style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gray-mon)">▸ № 06 · PHOTO_BOOTH/</span>
         <h2 style="margin-top:1rem;">The <em>office</em> as backdrop.</h2>
       </div>
-      <p>Photo-booth strips. Hover any to enlarge. The cafe has an actual office-themed photo booth on site too.</p>
+      <p>"Please enjoy taking photo in our space with your phone. Thank you." — that's the bio. Photo-booth strips below; the cafe has an actual office-themed photo booth on site too.</p>
     </div>
 
     <div class="gallery-grid">
@@ -1045,6 +1116,14 @@ footer .credit{opacity:.55;max-width:48ch;line-height:1.7}
           <div class="label">FACEBOOK</div>
           <div class="value"><a href="https://www.facebook.com/AkirartCafe/" target="_blank" rel="noopener">/AkirartCafe</a></div>
         </div>
+        <div class="block">
+          <div class="label">PHONE</div>
+          <div class="value"><a href="tel:+66864087242">086-408-7242</a></div>
+        </div>
+        <div class="block">
+          <div class="label">DELIVERY</div>
+          <div class="value">Via <em>Lineman</em> · search "Akirart"</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1127,6 +1206,60 @@ footer .credit{opacity:.55;max-width:48ch;line-height:1.7}
       }
     }
   });
+
+  // === BIOS BOOT SEQUENCE — signature moment ===
+  const boot=$('#biosBoot'); const lines=$('#biosLines'); const skip=$('#biosSkip');
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let booted=false; try{booted=sessionStorage.getItem('akirart_booted')==='1';}catch(_){ }
+  const script=[
+    {t:'AKIRART CAFE STUDIO · BIOS v1.990', c:'amber', d:60},
+    {t:'(C) 1990  KAMARART PRODUCTIONS  ·  POM PRAP, BKK', c:'dim', d:50},
+    {t:'', d:140},
+    {t:'POST: MEMORY ............ OK    64K', d:90},
+    {t:'POST: KEYBOARD .......... OK', d:80},
+    {t:'POST: TYPEWRITER (BEIGE)  OK', d:80},
+    {t:'POST: FLOPPY A: ......... READY', d:80},
+    {t:'POST: FILM LAB BAY 01 ... READY', c:'amber', d:90},
+    {t:'POST: COFFEE BAR ........ PRESSURIZED', c:'amber', d:90},
+    {t:'', d:120},
+    {t:'LOADING /AKIRART/HOME.EXE ...', d:160},
+    {t:'READY.', c:'amber', d:260}
+  ];
+  function endBoot(){
+    if(!boot) return;
+    boot.classList.add('power-off');
+    setTimeout(()=>{ boot.style.display='none'; document.body.classList.remove('booting'); try{sessionStorage.setItem('akirart_booted','1');}catch(_){ } },600);
+  }
+  if(!boot){return;}
+  if(booted){
+    boot.style.display='none'; document.body.classList.remove('booting'); return;
+  }
+  document.body.classList.add('booting');
+  if(reduced){
+    lines.innerHTML='<span class="bios-line amber">AKIRART · READY.</span>';
+    setTimeout(endBoot,700); return;
+  }
+  let i=0;
+  function nextLine(){
+    if(i>=script.length){
+      const cursor=document.createElement('span'); cursor.className='bios-cursor'; lines.appendChild(cursor);
+      setTimeout(endBoot, 520); return;
+    }
+    const item=script[i]; const span=document.createElement('span'); span.className='bios-line'+(item.c?' '+item.c:'');
+    lines.appendChild(span);
+    if(!item.t){span.textContent=' '; setTimeout(()=>{i++;nextLine();}, item.d); return;}
+    const text=item.t; let j=0;
+    const per=Math.max(8, Math.min(28, Math.floor(item.d/Math.max(text.length,1))*0.8));
+    function typeChar(){
+      if(j>=text.length){ setTimeout(()=>{i++;nextLine();}, 80); return; }
+      span.textContent += text[j++];
+      setTimeout(typeChar, per);
+    }
+    typeChar();
+  }
+  setTimeout(nextLine, 200);
+  skip?.addEventListener('click', endBoot);
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !boot.classList.contains('power-off') && boot.style.display!=='none') endBoot(); });
 })();
 </script>
 </body>
