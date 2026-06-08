@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="6" fill="#1a1612"/>
+  <!-- CRT screen with green text -->
+  <rect x="10" y="14" width="44" height="32" rx="2" fill="#0a0806" stroke="#7a6a4c" stroke-width="1"/>
+  <rect x="13" y="17" width="38" height="26" fill="#0d3a1f"/>
+  <text x="32" y="35" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="14" fill="#3aff7a" font-weight="700">A</text>
+  <!-- Base / stand -->
+  <rect x="22" y="46" width="20" height="6" rx="1" fill="#7a6a4c"/>
+  <rect x="20" y="52" width="24" height="3" rx="1" fill="#5a4d34"/>
+</svg>
