@@ -1235,6 +1235,8 @@ body.booting .topbar,body.booting .nav,body.booting .hero{opacity:0}
     boot.style.display='none'; document.body.classList.remove('booting'); return;
   }
   document.body.classList.add('booting');
+  // Safety net — guarantee body.booting clears even if typing chain errors (mobile hero stays visible)
+  setTimeout(()=>{ if(document.body.classList.contains('booting')) endBoot(); }, 12000);
   if(reduced){
     lines.innerHTML='<span class="bios-line amber">AKIRART · READY.</span>';
     setTimeout(endBoot,700); return;
@@ -1264,3 +1266,4 @@ body.booting .topbar,body.booting .nav,body.booting .hero{opacity:0}
 </script>
 </body>
 </html>
+   
